@@ -12,6 +12,10 @@ Made for [Siege](siege.hackclub.com) by [HackClub](hackclub.com).
 
 ## Installation
 
+### Requirements
+
+Python 3.10+
+
 ### Easy Installation
 Run the `run.sh` (on Linux/Mac) or `run.bat` (on Windows) to install the game!
 
