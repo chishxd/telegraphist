@@ -1,0 +1,16 @@
+[tool.ruff]
+# Allow ruff to fix all violations.
+fix = true
+# Show fixes in the editor.
+show-fixes = true
+# A generous line length.
+line-length = 119
+
+[tool.ruff.lint]
+# A great, comprehensive set of rules to check for.
+select = ["E", "F", "W", "I", "UP"]
+
+[tool.ruff.format]
+# Make the formatter compatible with Black's style.
+# This is the industry standard.
+quote-style = "double"
