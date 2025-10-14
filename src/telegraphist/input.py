@@ -9,12 +9,13 @@ key_down: bool = False
 
 
 def on_press(key: keyboard.Key | keyboard.KeyCode | None) -> None:
-    """Called by pynput on key press
+    """Handle spacebar press events for Morse code input.
 
-    This function accespts a key from pynput, it's main purpose is to "hold" a key and not key firing
+    Tracks when the spacebar is pressed to measure hold duration.
+    Prevents repeated key press events while the key is held down.
 
     Args:
-        key (keyboard.Key | keyboard.KeyCode | None): The key pressed on Keyboard.
+        key: The keyboard key that was pressed.
     """
     global key_down, press_time
 
@@ -23,13 +24,14 @@ def on_press(key: keyboard.Key | keyboard.KeyCode | None) -> None:
         press_time = time.time()
 
 
-def on_release(key: keyboard.Key | keyboard.KeyCode | None):
-    """This function is to be passed as a parameter for pynput
+def on_release(key: keyboard.Key | keyboard.KeyCode | None) -> None:
+    """Handle spacebar release events and output Morse code symbols.
 
-    This function accepts a key from pynput, calculate duration of the key being held and print result
+    Calculates the duration the spacebar was held and outputs either
+    a dot (.) for short presses or a dash (-) for long presses.
 
     Args:
-        key (keyboard.Key | keyboard.KeyCode | None): The Key recieved from keyboard input
+        key: The keyboard key that was released.
     """
 
     global key_down, press_time
@@ -44,3 +46,13 @@ def on_release(key: keyboard.Key | keyboard.KeyCode | None):
 
         press_time = None
         key_down = False
+
+
+def start_listening() -> None:
+    """Start listening for keyboard input to capture Morse code.
+
+    Creates a keyboard listener that monitors spacebar press and release
+    events. This function blocks execution until the listener is stopped.
+    """
+    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+        listener.join()
