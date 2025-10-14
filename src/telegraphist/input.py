@@ -1,5 +1,5 @@
 import time
-
+from typing import Callable
 from pynput import keyboard
 
 DOT_DURATION: float = 0.2
@@ -24,7 +24,7 @@ def on_press(key: keyboard.Key | keyboard.KeyCode | None) -> None:
         press_time = time.time()
 
 
-def on_release(key: keyboard.Key | keyboard.KeyCode | None) -> None:
+def on_release(key: keyboard.Key | keyboard.KeyCode | None, on_char_received: Callable[[str], None]) -> None:
     """Handle spacebar release events and output Morse code symbols.
 
     Calculates the duration the spacebar was held and outputs either
@@ -40,19 +40,19 @@ def on_release(key: keyboard.Key | keyboard.KeyCode | None) -> None:
         duration = time.time() - press_time
 
         if duration < DOT_DURATION:
-            print(".", end="", flush=True)
+            on_char_received('.')
         else:
-            print("-", end="", flush=True)
+            on_char_received('-')
 
         press_time = None
         key_down = False
 
 
-def start_listening() -> None:
+def start_listening(on_char_received: Callable[[str], None]) -> None:
     """Start listening for keyboard input to capture Morse code.
 
     Creates a keyboard listener that monitors spacebar press and release
     events. This function blocks execution until the listener is stopped.
     """
-    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+    with keyboard.Listener(on_press=on_press, on_release=lambda key: on_release(key, on_char_received)) as listener:
         listener.join()
