@@ -1,3 +1,10 @@
+"""
+This file contains definitive data for Morse code in the game.
+
+"""
+
+# This dictionary follows the International Morse Code standard.
+# It includes all 26 letters of the English alphabet and numbers 0-9.
 MORSE_CODE_DICT: dict[str, str] = {
     "A": ".-",
     "B": "-...",
@@ -36,3 +43,5 @@ MORSE_CODE_DICT: dict[str, str] = {
     "8": "---..",
     "9": "----.",
 }
+
+print(MORSE_CODE_DICT['A'])
