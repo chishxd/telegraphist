@@ -2,6 +2,7 @@ import threading
 import time
 
 from rich.console import Console
+from rich.control import Control
 
 # from rich.live import Live
 from rich.panel import Panel
@@ -19,7 +20,7 @@ def handle_new_char(char: str) -> None:
 
 
 def start_game() -> None:
-    global current_input
+    global current_input, CURSOR_TO_HOME, HIDE_CURSOR, SHOW_CURSOR, CLEAR_SCREEN
 
     listener_thread = threading.Thread(target=start_listening, args=(handle_new_char,))
     listener_thread.daemon = True
@@ -27,12 +28,14 @@ def start_game() -> None:
     listener_thread.start()
     console = Console()
 
+    console.control(Control.show_cursor(False))
+    console.clear()
     try:
         while True:
-            CURSOR_UP_TOP = "\x1b[H"
-            print(CURSOR_UP_TOP, end="")
+            console.control(Control.home())
 
             display_text = f"Your Transmission:\n> {current_input}"
+            ui_panel = Panel(display_text, title="Telegraph Console")
             ui_panel = Panel(display_text, title="Telegraph Console")
 
             console.print(ui_panel)
@@ -40,5 +43,8 @@ def start_game() -> None:
             time.sleep(0.05)
 
     except KeyboardInterrupt:
-        console.clear()
-        console.print("\n[bold red] Game Ended![/bold red]")
+        pass
+
+    finally:
+        console.control(Control.show_cursor(True))
+        console.print("[bold red]Transmission Ended.[/bold red]")
