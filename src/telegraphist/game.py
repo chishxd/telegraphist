@@ -2,7 +2,8 @@ import threading
 import time
 
 from rich.console import Console
-from rich.live import Live
+
+# from rich.live import Live
 from rich.panel import Panel
 
 from src.telegraphist.input import start_listening
@@ -27,10 +28,17 @@ def start_game() -> None:
     console = Console()
 
     try:
-        with Live(console=console, screen=False, auto_refresh=True) as live:
-            while True:
-                ui_panel = Panel(current_input, title="Your Transmission")
-                live.update(ui_panel)
-                time.sleep(0.05)
+        while True:
+            CURSOR_UP_TOP = "\x1b[H"
+            print(CURSOR_UP_TOP, end="")
+
+            display_text = f"Your Transmission:\n> {current_input}"
+            ui_panel = Panel(display_text, title="Telegraph Console")
+
+            console.print(ui_panel)
+
+            time.sleep(0.05)
+
     except KeyboardInterrupt:
+        console.clear()
         console.print("\n[bold red] Game Ended![/bold red]")
