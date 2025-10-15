@@ -43,5 +43,3 @@ MORSE_CODE_DICT: dict[str, str] = {
     "8": "---..",
     "9": "----.",
 }
-
-print(MORSE_CODE_DICT['A'])
