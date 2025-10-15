@@ -1,5 +1,6 @@
 import time
-from typing import Callable
+from collections.abc import Callable
+
 from pynput import keyboard
 
 DOT_DURATION: float = 0.2
