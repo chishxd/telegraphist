@@ -35,7 +35,7 @@ def start_game() -> None:
 
     Handles positioning of cursor, it's visibility and ensures clearing terminal before and after the game.
     """
-    global current_input
+    global current_input, player_input_for_letter, current_letter_index
 
     listener_thread = threading.Thread(target=start_listening, args=(handle_new_char,))
     listener_thread.daemon = True
@@ -63,7 +63,19 @@ def start_game() -> None:
                 title="Telegraph Console",
                 border_style="cyan",
             )
+
             console.print(transmission_panel)
+            if player_input_for_letter == correct_morse:
+                # TODO: Add success sound
+                current_letter_index += 1
+                player_input_for_letter = ""
+                if current_letter_index >= len(target_word):
+                    console.print("[bold green] You won! [/bold green]")
+                    break
+
+            elif not correct_morse.startswith(player_input_for_letter):
+                # TODO: Add error sound and visual feedback
+                player_input_for_letter = ""
 
             time.sleep(0.05)
 
@@ -87,27 +99,7 @@ def game_loop() -> None:
     """
     global current_input, player_input_for_letter, current_letter_index
 
-    console = Console()
-
-    current_level_data = levels[current_level_index]
-    target_word = current_level_data["word"]
-    current_char = target_word[current_letter_index]
-    correct_morse = MORSE_CODE_DICT[current_char]
-
     with input_lock:
         if current_input:
             player_input_for_letter += current_input
             current_input = ""
-
-    if player_input_for_letter == correct_morse:
-        # TODO: Add success sound
-        current_letter_index += 1
-        player_input_for_letter = ""
-        if current_letter_index >= len(target_word):
-            console.print("[bold green] You won! [/bold green]")
-            exit()
-
-    # Check for failure
-    elif not correct_morse.startswith(player_input_for_letter):
-        # TODO: Add error sound and visual feedback
-        player_input_for_letter = ""
