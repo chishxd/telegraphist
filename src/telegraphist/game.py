@@ -16,6 +16,8 @@ from src.telegraphist.morse_code import MORSE_CODE_DICT
 current_input = ""
 input_lock = threading.Lock()
 
+feedback_message: str = ""
+
 
 def handle_new_char(char: str) -> None:
     """Handles space key press to morse code
@@ -35,7 +37,7 @@ def start_game() -> None:
 
     Handles positioning of cursor, it's visibility and ensures clearing terminal before and after the game.
     """
-    global current_input, player_input_for_letter, current_letter_index
+    global current_input, player_input_for_letter, current_letter_index, feedback_message
 
     listener_thread = threading.Thread(target=start_listening, args=(handle_new_char,))
     listener_thread.daemon = True
@@ -52,7 +54,13 @@ def start_game() -> None:
             target_word = current_level_data["word"]
 
             game_loop()
+
             console.control(Control.home())
+
+            if current_letter_index >= len(target_word):
+                console.print(Panel(f"Correct: '{target_word[-1]}'", border_style="yellow"))
+                console.print(Panel("[bold green]You won![/bold green]", border_style="green"))
+                break
 
             current_char = target_word[current_letter_index]
             correct_morse = MORSE_CODE_DICT[current_char]
@@ -65,17 +73,10 @@ def start_game() -> None:
             )
 
             console.print(transmission_panel)
-            if player_input_for_letter == correct_morse:
-                # TODO: Add success sound
-                current_letter_index += 1
-                player_input_for_letter = ""
-                if current_letter_index >= len(target_word):
-                    console.print("[bold green] You won! [/bold green]")
-                    break
 
-            elif not correct_morse.startswith(player_input_for_letter):
-                # TODO: Add error sound and visual feedback
-                player_input_for_letter = ""
+            if feedback_message:
+                console.print(Panel(feedback_message, border_style="yellow"))
+                feedback_message = ""
 
             time.sleep(0.05)
 
@@ -97,9 +98,29 @@ def game_loop() -> None:
 
     This function checks for the value of current level and forwards that data to UI
     """
-    global current_input, player_input_for_letter, current_letter_index
+    global current_input, player_input_for_letter, current_letter_index, feedback_message
+
+    current_level_data = levels[current_level_index]
+    target_word = current_level_data["word"]
+
+    if current_letter_index >= len(target_word):
+        return
+
+    current_char = target_word[current_letter_index]
+    correct_morse = MORSE_CODE_DICT[current_char]
 
     with input_lock:
         if current_input:
             player_input_for_letter += current_input
             current_input = ""
+
+        if player_input_for_letter == correct_morse:
+            # TODO: Add success sound
+            current_letter_index += 1
+            player_input_for_letter = ""
+            feedback_message = f"Correct: '{current_char}'"
+
+        elif not correct_morse.startswith(player_input_for_letter):
+            # TODO: Add error sound and visual feedback
+            feedback_message = "[bold red]Wrong Code![/bold red]"
+            player_input_for_letter = ""
