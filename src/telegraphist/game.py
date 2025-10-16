@@ -21,17 +21,22 @@ feedback_message: str = ""
 
 def display_title_screen() -> None:
     console = Console()
+    console.clear()
 
-    console.print("""[bold cyan]
-  ________            ______     __                            __    _      __ 
- /_  __/ /_  ___     /_  __/__  / /__  ____ __________ _____  / /_  (_)____/ /_
-  / / / __ \/ _ \     / / / _ \/ / _ \/ __ `/ ___/ __ `/ __ \/ __ \/ / ___/ __/ # type: ignore
- / / / / / /  __/    / / /  __/ /  __/ /_/ / /  / /_/ / /_/ / / / / (__  ) /_  
-/_/ /_/ /_/\___/    /_/  \___/_/\___/\__, /_/   \__,_/ .___/_/ /_/_/____/\__/  
-                                    /____/          /_/
-                  [/bold cyan] """)  # noqa: W605
+    title_art = """
+  _______ _            _______   _                            _     _     _   
+ |__   __| |          |__   __| | |                          | |   (_)   | |  
+    | |  | |__   ___     | | ___| | ___  __ _ _ __ __ _ _ __ | |__  _ ___| |_ 
+    | |  | '_ \ / _ \    | |/ _ \ |/ _ \/ _` | '__/ _` | '_ \| '_ \| / __| __|
+    | |  | | | |  __/    | |  __/ |  __/ (_| | | | (_| | |_) | | | | \__ \ |_ 
+    |_|  |_| |_|\___|    |_|\___|_|\___|\__, |_|  \__,_| .__/|_| |_|_|___/\__|
+                                         __/ |         | |                    
+                                        |___/          |_|                    
+"""
 
-    console.print("[bold yellow] Press Enter to Start [/bold yellow]")
+    console.print(f"[bold cyan]{title_art}[/bold cyan]", justify="center")
+
+    input("\n \n" + " " * 40 + "Press Enter to Start Transmission...")
 
 
 def handle_new_char(char: str) -> None:
@@ -53,6 +58,8 @@ def start_game() -> None:
     Handles positioning of cursor, it's visibility and ensures clearing terminal before and after the game.
     """
     global current_input, player_input_for_letter, current_letter_index, feedback_message
+
+    display_title_screen()
 
     listener_thread = threading.Thread(target=start_listening, args=(handle_new_char,))
     listener_thread.daemon = True
