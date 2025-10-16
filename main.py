@@ -1,10 +1,10 @@
-from src.telegraphist.game import start_game
+from src.telegraphist.game import display_title_screen
 
 # from src.telegraphist.input import start_listening
 
 
 def main() -> None:
-    start_game()
+    display_title_screen()
 
 
 if __name__ == "__main__":

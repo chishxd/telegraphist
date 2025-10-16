@@ -19,6 +19,21 @@ input_lock = threading.Lock()
 feedback_message: str = ""
 
 
+def display_title_screen() -> None:
+    console = Console()
+
+    console.print("""[bold cyan]
+  ________            ______     __                            __    _      __ 
+ /_  __/ /_  ___     /_  __/__  / /__  ____ __________ _____  / /_  (_)____/ /_
+  / / / __ \/ _ \     / / / _ \/ / _ \/ __ `/ ___/ __ `/ __ \/ __ \/ / ___/ __/ # type: ignore
+ / / / / / /  __/    / / /  __/ /  __/ /_/ / /  / /_/ / /_/ / / / / (__  ) /_  
+/_/ /_/ /_/\___/    /_/  \___/_/\___/\__, /_/   \__,_/ .___/_/ /_/_/____/\__/  
+                                    /____/          /_/
+                  [/bold cyan] """)  # noqa: W605
+
+    console.print("[bold yellow] Press Enter to Start [/bold yellow]")
+
+
 def handle_new_char(char: str) -> None:
     """Handles space key press to morse code
 
