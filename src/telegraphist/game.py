@@ -76,30 +76,34 @@ def start_game() -> None:
             current_level_data = levels[current_level_index]
             target_word = current_level_data["word"]
 
+            if current_letter_index >= len(target_word):
+                console.clear()
+                console.print(Panel(f"Correct: '{target_word[-1]}'", border_style="yellow"))
+                console.print(Panel("[bold green]You won![/bold green]", border_style="green"))
+                playsound("src/telegraphist/sfx/level_up.wav", block=False)
+                input("\n" + " " * 40 + "Press Enter to Continue...")
+                break
+
             game_loop()
 
             console.control(Control.home())
 
-            if current_letter_index >= len(target_word):
-                console.print(Panel(f"Correct: '{target_word[-1]}'", border_style="yellow"))
-                console.print(Panel("[bold green]You won![/bold green]", border_style="green"))
-                break
+            if current_letter_index < len(target_word):
+                current_char = target_word[current_letter_index]
+                correct_morse = MORSE_CODE_DICT[current_char]
 
-            current_char = target_word[current_letter_index]
-            correct_morse = MORSE_CODE_DICT[current_char]
+                cheat_sheet = f"Transmit '{current_char}': [bold cyan]{correct_morse}[/bold cyan]"
+                transmission_panel = Panel(
+                    f"{cheat_sheet}\n\nYour Input: {player_input_for_letter}",
+                    title="Telegraph Console",
+                    border_style="cyan",
+                )
 
-            cheat_sheet = f"Transmit '{current_char}': [bold cyan]{correct_morse}[/bold cyan]"
-            transmission_panel = Panel(
-                f"{cheat_sheet}\n\nYour Input: {player_input_for_letter}",
-                title="Telegraph Console",
-                border_style="cyan",
-            )
+                console.print(transmission_panel)
 
-            console.print(transmission_panel)
-
-            if feedback_message:
-                console.print(Panel(feedback_message, border_style="yellow"))
-                feedback_message = ""
+                if feedback_message:
+                    console.print(Panel(feedback_message, border_style="yellow"))
+                    feedback_message = ""
 
             time.sleep(0.05)
 
