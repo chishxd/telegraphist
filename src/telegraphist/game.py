@@ -92,7 +92,7 @@ def start_game() -> None:
                     input("\n" + " " * 40 + "Press Enter to Continue...")
                     break
                 else:
-                    completed_msg = f"[bold green]Level {current_level_data['level']} Complete![/bold green]"
+                    completed_msg = f"[bold green]Level {current_level_data['level']} Complete! Transmitted: {current_level_data['word']}[/bold green]"  # noqa: E501
                     console.print(Panel(completed_msg, border_style="green"))
                     next_level = levels[current_level_index]["level"]
                     next_msg = f"[cyan]Get ready for Level {next_level}...[/cyan]"
