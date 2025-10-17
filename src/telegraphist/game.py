@@ -19,6 +19,10 @@ input_lock = threading.Lock()
 
 feedback_message: str = ""
 
+current_level_index = 0
+current_letter_index = 0
+player_input_for_letter = ""
+
 
 def display_title_screen() -> None:
     console = Console()
@@ -58,7 +62,7 @@ def start_game() -> None:
 
     Handles positioning of cursor, it's visibility and ensures clearing terminal before and after the game.
     """
-    global current_input, player_input_for_letter, current_letter_index, feedback_message
+    global current_input, player_input_for_letter, current_level_index, current_letter_index, feedback_message
 
     display_title_screen()
 
@@ -78,11 +82,24 @@ def start_game() -> None:
 
             if current_letter_index >= len(target_word):
                 console.clear()
-                console.print(Panel(f"Correct: '{target_word[-1]}'", border_style="yellow"))
-                console.print(Panel("[bold green]You won![/bold green]", border_style="green"))
                 playsound("src/telegraphist/sfx/level_up.wav", block=False)
-                input("\n" + " " * 40 + "Press Enter to Continue...")
-                break
+
+                current_level_index += 1
+
+                if current_level_index >= len(levels):
+                    msg = "[bold green]Congratulations! You completed all levels![/bold green]"
+                    console.print(Panel(msg, border_style="green"))
+                    input("\n" + " " * 40 + "Press Enter to Continue...")
+                    break
+                else:
+                    completed_msg = f"[bold green]Level {current_level_data['level']} Complete![/bold green]"
+                    console.print(Panel(completed_msg, border_style="green"))
+                    next_level = levels[current_level_index]["level"]
+                    next_msg = f"[cyan]Get ready for Level {next_level}...[/cyan]"
+                    console.print(Panel(next_msg, border_style="cyan"))
+                    time.sleep(2)
+
+                current_letter_index = 0
 
             game_loop()
 
@@ -112,12 +129,7 @@ def start_game() -> None:
 
     finally:
         console.control(Control.show_cursor(True))
-        console.print("[bold red]Transmission Ended.[/bold red]")
-
-
-current_level_index = 0
-current_letter_index = 0
-player_input_for_letter = ""
+        console.print("[bold red]Thank You for playing![/bold red]")
 
 
 def game_loop() -> None:
@@ -142,14 +154,12 @@ def game_loop() -> None:
             current_input = ""
 
         if player_input_for_letter == correct_morse:
-            # TODO: Add success sound
             playsound("src/telegraphist/sfx/success.wav", block=False)
             current_letter_index += 1
             player_input_for_letter = ""
             feedback_message = f"Correct: '{current_char}'"
 
         elif not correct_morse.startswith(player_input_for_letter):
-            # TODO: Add error sound and visual feedback
             playsound("src/telegraphist/sfx/error.wav", block=False)
             feedback_message = "[bold red]Wrong Code![/bold red]"
             player_input_for_letter = ""
