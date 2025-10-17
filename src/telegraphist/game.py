@@ -1,6 +1,7 @@
 import threading
 import time
 
+from playsound3 import playsound
 from rich.console import Console
 from rich.control import Control
 
@@ -138,11 +139,13 @@ def game_loop() -> None:
 
         if player_input_for_letter == correct_morse:
             # TODO: Add success sound
+            playsound("src/telegraphist/sfx/success.wav", block=False)
             current_letter_index += 1
             player_input_for_letter = ""
             feedback_message = f"Correct: '{current_char}'"
 
         elif not correct_morse.startswith(player_input_for_letter):
             # TODO: Add error sound and visual feedback
+            playsound("src/telegraphist/sfx/error.wav", block=False)
             feedback_message = "[bold red]Wrong Code![/bold red]"
             player_input_for_letter = ""

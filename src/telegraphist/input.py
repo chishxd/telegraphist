@@ -1,6 +1,7 @@
 import time
 from collections.abc import Callable
 
+from playsound3 import playsound
 from pynput import keyboard
 
 DOT_DURATION: float = 0.2
@@ -41,9 +42,11 @@ def on_release(key: keyboard.Key | keyboard.KeyCode | None, on_char_received: Ca
         duration = time.time() - press_time
 
         if duration < DOT_DURATION:
-            on_char_received('.')
+            playsound("src/telegraphist/sfx/dot.wav", block=False)
+            on_char_received(".")
         else:
-            on_char_received('-')
+            playsound("src/telegraphist/sfx/dash.wav", block=False)
+            on_char_received("-")
 
         press_time = None
         key_down = False
