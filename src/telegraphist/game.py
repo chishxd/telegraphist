@@ -23,6 +23,11 @@ current_level_index = 0
 current_letter_index = 0
 player_input_for_letter = ""
 
+# These state variables will handle all the timer logic
+word_start_time: float = time.time()
+word_time_limit: float = 15.0
+game_over: bool = False
+
 
 def display_title_screen() -> None:
     console = Console()
@@ -63,6 +68,7 @@ def start_game() -> None:
     Handles positioning of cursor, it's visibility and ensures clearing terminal before and after the game.
     """
     global current_input, player_input_for_letter, current_level_index, current_letter_index, feedback_message
+    global word_time_limit, word_start_time
 
     display_title_screen()
 
@@ -76,7 +82,7 @@ def start_game() -> None:
         console.control(Control.show_cursor(False))
         console.clear()
 
-        while True:
+        while not game_over:
             current_level_data = levels[current_level_index]
             target_word = current_level_data["word"]
 
@@ -106,11 +112,16 @@ def start_game() -> None:
             console.control(Control.home())
 
             if current_letter_index < len(target_word):
+                # Calculate time remaining on each iteration
+                time_remaining = word_time_limit - (time.time() - word_start_time)
+                time_remaining = max(0, time_remaining)  # Don't show negative time
+
                 current_char = target_word[current_letter_index]
                 correct_morse = MORSE_CODE_DICT[current_char]
 
                 cheat_sheet = f"Transmit '{current_char}': [bold cyan]{correct_morse}[/bold cyan]"
                 transmission_panel = Panel(
+                    f"[bold red]Time Remaining: {time_remaining:.1f}s[/bold red]\n\n"
                     f"{cheat_sheet}\n\nYour Input: {player_input_for_letter}",
                     title="Telegraph Console",
                     border_style="cyan",
@@ -137,12 +148,21 @@ def game_loop() -> None:
 
     This function checks for the value of current level and forwards that data to UI
     """
+
     global current_input, player_input_for_letter, current_letter_index, feedback_message
+    global game_over, word_time_limit, word_start_time
+
+    elapsed_time = time.time() - word_start_time
+
+    if elapsed_time > word_time_limit:
+        game_over = True
+        return
 
     current_level_data = levels[current_level_index]
     target_word = current_level_data["word"]
 
     if current_letter_index >= len(target_word):
+        word_time_limit = time.time()
         return
 
     current_char = target_word[current_letter_index]
