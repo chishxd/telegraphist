@@ -33,7 +33,14 @@ Telegraphist is a text-based game where you have to telegraph messages in a high
 Python 3.10+
 
 ### Easy Installation
+Clone the repository and open it.
 Run the `run.sh` (on Linux/Mac) or `run.bat` (on Windows) to install the game!
+
+> NOTE: Linux/Mac user would need to make the `run.sh` executable first
+```sh
+chmod +x run.sh
+./run.sh
+```
 
 ### Manual installation
 
