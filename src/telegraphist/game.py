@@ -129,7 +129,7 @@ def start_game() -> None:
 
     finally:
         console.control(Control.show_cursor(True))
-        console.print("[bold red]Thank You for playing![/bold red]")
+        console.print("[bold blue]Thank You for playing![/bold blue]")
 
 
 def game_loop() -> None:

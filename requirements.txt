@@ -1,6 +1,7 @@
 evdev==1.9.2
 markdown-it-py==4.0.0
 mdurl==0.1.2
+playsound3==3.2.8
 Pygments==2.19.2
 pynput==1.8.1
 python-xlib==0.33
