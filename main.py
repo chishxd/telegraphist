@@ -1,10 +1,11 @@
-from src.telegraphist.game import start_game
+from src.telegraphist.game import start_game, analyse_word
 
 # from src.telegraphist.input import start_listening
 
 
 def main() -> None:
-    start_game()
+    data = analyse_word("SOS")
+    print(data)
 
 
 if __name__ == "__main__":

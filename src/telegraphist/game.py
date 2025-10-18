@@ -152,14 +152,14 @@ def game_loop() -> None:
     global current_input, player_input_for_letter, current_letter_index, feedback_message
     global game_over, word_time_limit, word_start_time
 
+    current_level_data = levels[current_level_index]
+    target_word = current_level_data["word"]
+
     elapsed_time = time.time() - word_start_time
 
     if elapsed_time > word_time_limit:
         game_over = True
         return
-
-    current_level_data = levels[current_level_index]
-    target_word = current_level_data["word"]
 
     if current_letter_index >= len(target_word):
         word_time_limit = time.time()
@@ -183,3 +183,16 @@ def game_loop() -> None:
             playsound("src/telegraphist/sfx/error.wav", block=False)
             feedback_message = "[bold red]Wrong Code![/bold red]"
             player_input_for_letter = ""
+
+
+def analyse_word(word: str) -> dict[str, int]:
+    return_data: dict[str, int] = {"dots": 0, "dashes": 0}
+    for char in word:
+        morse = MORSE_CODE_DICT[char]
+        for symbol in morse:
+            if symbol == ".":
+                return_data["dots"] += 1
+            elif symbol == "-":
+                return_data["dashes"] += 1
+
+    return return_data
