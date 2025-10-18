@@ -3,7 +3,7 @@ name: Build and Release Executables
 on:
   push:
       tags:
-        '-v'
+        '-v*'
 
 jobs:
   build:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-       os: [ubuntu-latest, fedora-latest, macos-latest, windows-latest]
+       os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
     - name: Check Out Code
@@ -29,8 +29,15 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
 
-    - name: Build the executable
-      run: pyinstaller main.py --name "TheTelegraphist-${{ matrix.os }}" --onefile --noconsole --add-data "src/telegraphist/sfx:src/telegraphist/sfx"
+    - name: Build the executable (Linux/macOS)
+      if: runner.os != 'Windows'
+      run: |
+        pyinstaller main.py --name "TheTelegraphist-${{ matrix.os }}" --onefile --noconsole --add-data "src/telegraphist/sfx:src/telegraphist/sfx"
+
+    - name: Build the executable (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        pyinstaller main.py --name "TheTelegraphist-${{ matrix.os }}" --onefile --noconsole --add-data "src/telegraphist/sfx;src/telegraphist/sfx"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
