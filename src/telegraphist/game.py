@@ -62,6 +62,21 @@ def handle_new_char(char: str) -> None:
         current_input += char
 
 
+def reset_game_state() -> None:
+    """Resets all game state variables to their initial values for a new game."""
+    global current_input, player_input_for_letter, current_level_index, current_letter_index
+    global feedback_message, word_start_time, word_time_limit, game_over
+
+    current_input = ""
+    player_input_for_letter = ""
+    current_level_index = 0
+    current_letter_index = 0
+    feedback_message = ""
+    word_start_time = time.time()
+    word_time_limit = 15.0
+    game_over = False
+
+
 def start_game() -> None:
     """Event to render the game UI
 
@@ -145,7 +160,7 @@ def start_game() -> None:
             target_word = current_level_data["word"]
 
             game_over_art = r"""
- ▗▄▄▖ ▗▄▖ ▗▖  ▗▖▗▄▄▄▖     ▗▄▖ ▗▖  ▗▖▗▄▄▄▖▗▄▄▖ 
+ ▗▄▄▖ ▗▄▖ ▗▖  ▗▖▗▄▄▄▖     ▗▄▖ ▗▖  ▗▖▗▄▄▄▖▗▄▄▖
 ▐▌   ▐▌ ▐▌▐▛▚▞▜▌▐▌       ▐▌ ▐▌▐▌  ▐▌▐▌   ▐▌ ▐▌
 ▐▌▝▜▌▐▛▀▜▌▐▌  ▐▌▐▛▀▀▘    ▐▌ ▐▌▐▌  ▐▌▐▛▀▀▘▐▛▀▚▖
 ▝▚▄▞▘▐▌ ▐▌▐▌  ▐▌▐▙▄▄▖    ▝▚▄▞▘ ▝▚▞▘ ▐▙▄▄▖▐▌ ▐▌
@@ -159,7 +174,23 @@ def start_game() -> None:
             stats_msg += f"[cyan]Letters Transmitted:[/cyan] {current_letter_index}/{len(target_word)}"
 
             console.print(Panel(stats_msg, title="Transmission Failed", border_style="red"))
-            input("\n" + " " * 40 + "Press Enter to Exit...")
+
+            # Ask user if they want to replay or exit
+            console.print("\n[bold cyan]Would you like to try again?[/bold cyan]")
+            console.print("[green]1.[/green] Replay Game")
+            console.print("[red]2.[/red] Exit")
+
+            choice = input("\n" + " " * 40 + "Enter your choice (1 or 2): ").strip()
+
+            if choice == "1":
+                # Reset game state and replay
+                console.clear()
+                reset_game_state()
+                start_game()
+                return
+            else:
+                # Exit the game
+                pass
 
     except KeyboardInterrupt:
         pass
