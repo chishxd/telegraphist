@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "the-telegraphist"
-version = "1.0.1"
+version = "1.0.2"
 authors = [
   { name = "Chinmay Shet", email = "chishxd@gmail.com" },
 ]
@@ -25,7 +25,7 @@ dependencies = [
 
 
 [project.scripts]
-the-telegraphist = "src.telegraphist.game:start_game"
+the-telegraphist = "telegraphist.game:start_game"
 
 [tool.setuptools.packages.find]
 where = ["src"]
