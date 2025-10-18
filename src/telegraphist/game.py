@@ -82,7 +82,7 @@ def start_game() -> None:
         console.control(Control.show_cursor(False))
         console.clear()
 
-        while True:
+        while not game_over:
             current_level_data = levels[current_level_index]
             target_word = current_level_data["word"]
 
@@ -137,6 +137,29 @@ def start_game() -> None:
                     feedback_message = ""
 
             time.sleep(0.05)
+
+        # Game over screen
+        if game_over:
+            console.clear()
+            current_level_data = levels[current_level_index]
+            target_word = current_level_data["word"]
+
+            game_over_art = r"""
+ ▗▄▄▖ ▗▄▖ ▗▖  ▗▖▗▄▄▄▖     ▗▄▖ ▗▖  ▗▖▗▄▄▄▖▗▄▄▖ 
+▐▌   ▐▌ ▐▌▐▛▚▞▜▌▐▌       ▐▌ ▐▌▐▌  ▐▌▐▌   ▐▌ ▐▌
+▐▌▝▜▌▐▛▀▜▌▐▌  ▐▌▐▛▀▀▘    ▐▌ ▐▌▐▌  ▐▌▐▛▀▀▘▐▛▀▚▖
+▝▚▄▞▘▐▌ ▐▌▐▌  ▐▌▐▙▄▄▖    ▝▚▄▞▘ ▝▚▞▘ ▐▙▄▄▖▐▌ ▐▌
+"""
+            console.print(f"[bold red]{game_over_art}[/bold red]", justify="center")
+            console.print("\n")
+
+            stats_msg = "[yellow]You ran out of time![/yellow]\n\n"
+            stats_msg += f"[cyan]Level Reached:[/cyan] {current_level_data['level']}\n"
+            stats_msg += f"[cyan]Word:[/cyan] {target_word}\n"
+            stats_msg += f"[cyan]Letters Transmitted:[/cyan] {current_letter_index}/{len(target_word)}"
+
+            console.print(Panel(stats_msg, title="Transmission Failed", border_style="red"))
+            input("\n" + " " * 40 + "Press Enter to Exit...")
 
     except KeyboardInterrupt:
         pass
