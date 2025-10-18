@@ -1,9 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "the-telegraphist"
+version = "1.0.0"
+authors = [
+  { name = "Chinmay Shet", email = "chishxd@gmail.com" },
+]
+description = "A Python-based rhythm game about transmitting messages in Morse code."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Games/Entertainment",
+]
+dependencies = [
+    "pynput",
+    "rich",
+    "playsound3",
+]
+
+
+[project.scripts]
+the-telegraphist = "src.telegraphist.game:start_game"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"src.telegraphist.sfx" = ["*.wav"]
+
 [tool.ruff]
-# Allow ruff to fix all violations.
 fix = true
-# Show fixes in the editor.
 show-fixes = true
-# A generous line length.
 line-length = 119
 
 [tool.ruff.lint]
