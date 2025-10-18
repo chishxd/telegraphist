@@ -121,6 +121,7 @@ def start_game() -> None:
                     time.sleep(2)
 
                 current_letter_index = 0
+                word_start_time = time.time()
 
             game_loop()
 
@@ -153,7 +154,6 @@ def start_game() -> None:
 
             time.sleep(0.05)
 
-        # Game over screen
         if game_over:
             console.clear()
             current_level_data = levels[current_level_index]
@@ -175,7 +175,6 @@ def start_game() -> None:
 
             console.print(Panel(stats_msg, title="Transmission Failed", border_style="red"))
 
-            # Ask user if they want to replay or exit
             console.print("\n[bold cyan]Would you like to try again?[/bold cyan]")
             console.print("[green]1.[/green] Replay Game")
             console.print("[red]2.[/red] Exit")
@@ -183,13 +182,12 @@ def start_game() -> None:
             choice = input("\n" + " " * 40 + "Enter your choice (1 or 2): ").strip()
 
             if choice == "1":
-                # Reset game state and replay
+
                 console.clear()
                 reset_game_state()
                 start_game()
                 return
             else:
-                # Exit the game
                 pass
 
     except KeyboardInterrupt:
