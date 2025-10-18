@@ -40,10 +40,7 @@ show-fixes = true
 line-length = 119
 
 [tool.ruff.lint]
-# A great, comprehensive set of rules to check for.
 select = ["E", "F", "W", "I", "UP"]
 
 [tool.ruff.format]
-# Make the formatter compatible with Black's style.
-# This is the industry standard.
 quote-style = "double"
