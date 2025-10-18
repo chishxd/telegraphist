@@ -1,5 +1,6 @@
 import threading
 import time
+from pathlib import Path
 
 from playsound3 import playsound
 from rich.console import Console
@@ -8,11 +9,15 @@ from rich.control import Control
 # from rich.live import Live
 from rich.panel import Panel
 
-from src.telegraphist.input import start_listening
-from src.telegraphist.levels import levels
+from .input import start_listening
+from .levels import levels
 
-# from src.telegraphist.levels import levels
-from src.telegraphist.morse_code import MORSE_CODE_DICT
+# from .levels import levels
+from .morse_code import MORSE_CODE_DICT
+
+# Get the directory where this module is located
+_MODULE_DIR = Path(__file__).parent
+_SFX_DIR = _MODULE_DIR / "sfx"
 
 current_input = ""
 input_lock = threading.Lock()
@@ -105,7 +110,7 @@ def start_game() -> None:
 
             if current_letter_index >= len(target_word):
                 console.clear()
-                playsound("src/telegraphist/sfx/level_up.wav", block=False)
+                playsound(str(_SFX_DIR / "level_up.wav"), block=False)
 
                 current_level_index += 1
 
@@ -230,14 +235,14 @@ def game_loop() -> None:
             current_input = ""
 
         if player_input_for_letter == correct_morse:
-            playsound("src/telegraphist/sfx/success.wav", block=False)
+            playsound(str(_SFX_DIR / "success.wav"), block=False)
             current_letter_index += 1
             player_input_for_letter = ""
             feedback_message = f"Correct: '{current_char}'"
             word_start_time = time.time()
 
         elif not correct_morse.startswith(player_input_for_letter):
-            playsound("src/telegraphist/sfx/error.wav", block=False)
+            playsound(str(_SFX_DIR / "error.wav"), block=False)
             feedback_message = "[bold red]Wrong Code![/bold red]"
             player_input_for_letter = ""
 
