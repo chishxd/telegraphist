@@ -13,7 +13,6 @@ from src.telegraphist.levels import levels
 
 # from src.telegraphist.levels import levels
 from src.telegraphist.morse_code import MORSE_CODE_DICT
-from src.telegraphist.utils import resource_path
 
 current_input = ""
 input_lock = threading.Lock()
@@ -106,7 +105,7 @@ def start_game() -> None:
 
             if current_letter_index >= len(target_word):
                 console.clear()
-                playsound(resource_path("src/telegraphist/sfx/level_up.wav"), block=False)
+                playsound("src/telegraphist/sfx/level_up.wav", block=False)
 
                 current_level_index += 1
 
@@ -231,14 +230,14 @@ def game_loop() -> None:
             current_input = ""
 
         if player_input_for_letter == correct_morse:
-            playsound(resource_path("src/telegraphist/sfx/success.wav"), block=False)
+            playsound("src/telegraphist/sfx/success.wav", block=False)
             current_letter_index += 1
             player_input_for_letter = ""
             feedback_message = f"Correct: '{current_char}'"
             word_start_time = time.time()
 
         elif not correct_morse.startswith(player_input_for_letter):
-            playsound(resource_path("src/telegraphist/sfx/error.wav"), block=False)
+            playsound("src/telegraphist/sfx/error.wav", block=False)
             feedback_message = "[bold red]Wrong Code![/bold red]"
             player_input_for_letter = ""
 
