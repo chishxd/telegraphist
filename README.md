@@ -1,14 +1,30 @@
 # Telegraphist
-
+<div align="center">
 Telegraphist is a TUI-based game made in Python which focuses on time, precision sending correct signals under pressure.
 
-<!-- GOTTA ADD A SCREENSHOT OR GIF HERE -->
+---
+
+![game screeshot](image.png)
+
+---
 
 # Introduction
 Telegraphist is a text-based game where you have to telegraph messages in a high pressure environment of war room during WW2... less time, almost no resources to send another signal. Each morse counts. What will you do?
 
-Made for [Siege](siege.hackclub.com) by [HackClub](hackclub.com).
 
+
+### Made for <br> 
+![Hack Club Badge](https://img.shields.io/badge/Hack%20Club-EC3750?logo=hackclub&logoColor=fff&style=for-the-badge)
+
+### Built Using
+![Python Badge](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge)
+
+### Project Info
+![GitHub License](https://img.shields.io/github/license/chishxd/telegraphist)
+![GitHub last commit](https://img.shields.io/github/last-commit/chishxd/telegraphist)
+
+
+</div>
 
 ## Installation
 
@@ -53,7 +69,7 @@ python telegraphist.py
 ## Tech Stack
 
 **Language** : Python
-**Libraries** : rich, pyinput (List my change)
+**Libraries** : rich, pyinput, playsound3
 
 
 ## Contributing
