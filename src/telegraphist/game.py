@@ -34,14 +34,14 @@ def display_title_screen() -> None:
     console.clear()
 
     title_art = """
-  _______ _            _______   _                            _     _     _   
- |__   __| |          |__   __| | |                          | |   (_)   | |  
-    | |  | |__   ___     | | ___| | ___  __ _ _ __ __ _ _ __ | |__  _ ___| |_ 
+  _______ _            _______   _                            _     _     _
+ |__   __| |          |__   __| | |                          | |   (_)   | |
+    | |  | |__   ___     | | ___| | ___  __ _ _ __ __ _ _ __ | |__  _ ___| |_
     | |  | '_ \ / _ \    | |/ _ \ |/ _ \/ _` | '__/ _` | '_ \| '_ \| / __| __|
-    | |  | | | |  __/    | |  __/ |  __/ (_| | | | (_| | |_) | | | | \__ \ |_ 
+    | |  | | | |  __/    | |  __/ |  __/ (_| | | | (_| | |_) | | | | \__ \ |_
     |_|  |_| |_|\___|    |_|\___|_|\___|\__, |_|  \__,_| .__/|_| |_|_|___/\__|
-                                         __/ |         | |                    
-                                        |___/          |_|                    
+                                         __/ |         | |
+                                        |___/          |_|
 """
 
     console.print(f"[bold cyan]{title_art}[/bold cyan]", justify="center")
@@ -82,9 +82,12 @@ def start_game() -> None:
         console.control(Control.show_cursor(False))
         console.clear()
 
-        while not game_over:
+        while True:
             current_level_data = levels[current_level_index]
             target_word = current_level_data["word"]
+
+            complexity = analyse_word(target_word)
+            word_time_limit = (complexity["dots"] * 0.5) + (complexity["dashes"] * 1.0) + 2.0
 
             if current_letter_index >= len(target_word):
                 console.clear()
@@ -147,6 +150,7 @@ def game_loop() -> None:
     """Handles core logic of each level
 
     This function checks for the value of current level and forwards that data to UI
+    It also plays sounds if a word is correct or wrong
     """
 
     global current_input, player_input_for_letter, current_letter_index, feedback_message
@@ -162,7 +166,6 @@ def game_loop() -> None:
         return
 
     if current_letter_index >= len(target_word):
-        word_time_limit = time.time()
         return
 
     current_char = target_word[current_letter_index]
@@ -178,6 +181,7 @@ def game_loop() -> None:
             current_letter_index += 1
             player_input_for_letter = ""
             feedback_message = f"Correct: '{current_char}'"
+            word_start_time = time.time()
 
         elif not correct_morse.startswith(player_input_for_letter):
             playsound("src/telegraphist/sfx/error.wav", block=False)
@@ -186,6 +190,17 @@ def game_loop() -> None:
 
 
 def analyse_word(word: str) -> dict[str, int]:
+    """Counts dots and slashes in a word.
+
+    Accepts a string word, loops through each character, and then through each
+    symbol of its morse code to count if it is a dot or a dash.
+
+    Args:
+        word (str): A word from a level
+
+    Returns:
+        dict[str, int]: Returned from counting the symbols in word
+    """
     return_data: dict[str, int] = {"dots": 0, "dashes": 0}
     for char in word:
         morse = MORSE_CODE_DICT[char]
