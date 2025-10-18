@@ -33,7 +33,7 @@ def display_title_screen() -> None:
     console = Console()
     console.clear()
 
-    title_art = """
+    title_art = r"""
   _______ _            _______   _                            _     _     _
  |__   __| |          |__   __| | |                          | |   (_)   | |
     | |  | |__   ___     | | ___| | ___  __ _ _ __ __ _ _ __ | |__  _ ___| |_
@@ -86,6 +86,10 @@ def start_game() -> None:
     global word_time_limit, word_start_time
 
     display_title_screen()
+    display_tutorial()
+
+    # Start the timer AFTER the briefing is complete
+    word_start_time = time.time()
 
     listener_thread = threading.Thread(target=start_listening, args=(handle_new_char,))
     listener_thread.daemon = True
@@ -182,7 +186,6 @@ def start_game() -> None:
             choice = input("\n" + " " * 40 + "Enter your choice (1 or 2): ").strip()
 
             if choice == "1":
-
                 console.clear()
                 reset_game_state()
                 start_game()
@@ -263,3 +266,66 @@ def analyse_word(word: str) -> dict[str, int]:
                 return_data["dashes"] += 1
 
     return return_data
+
+
+def type_text(console: Console, text: str) -> None:
+    """Displays text with a typing effect character by character.
+
+    Args:
+        console (Console): The Rich console instance
+        text (str): The text to display with typing effect
+    """
+    for char in text:
+        console.print(char, end="")
+        time.sleep(0.02)
+
+
+def display_tutorial() -> None:
+    """Displays the mission briefing and tutorial before the game starts."""
+    console = Console()
+    console.clear()
+
+    # Connection sequence
+    type_text(console, "> CONNECTING TO FIELD OPERATOR TERMINAL...\n")
+    time.sleep(0.5)
+    type_text(console, "> CONNECTION ESTABLISHED.\n")
+    time.sleep(0.5)
+    console.print("> AUTHENTICATION: [bold green]VALID[/bold green]")
+    time.sleep(2)
+
+    type_text(console, "\n> INCOMING MESSAGE...\n")
+    time.sleep(1)
+
+    console.clear()
+
+    mission_text = """Operator.
+
+Your mission is critical. You are our last line of communication.
+
+You will receive messages that must be transmitted immediately.
+Time is of the essence. Each transmission is on a strict timer.
+
+Failure is not an option."""
+
+    mission_panel = Panel(mission_text, border_style="red", title="[bold red]CLASSIFIED[/bold red]")
+    console.print(mission_panel)
+
+    input("\n" + " " * 30 + "Press Enter to review transmission protocol...")
+
+    console.clear()
+
+    protocol_text = """[bold cyan]TRANSMISSION PROTOCOL:[/bold cyan]
+
+1. A target word will be displayed.
+2. A 'cheat sheet' will show the required Morse code for each letter.
+3. Use your [bold yellow]SPACEBAR[/bold yellow] to transmit the signal.
+
+   • A [bold cyan]short tap[/bold cyan] sends a DOT (.).
+   • A [bold cyan]long press[/bold cyan] sends a DASH (-).
+
+[bold red]Transmit with speed and precision. The world is listening.[/bold red]"""
+
+    protocol_panel = Panel(protocol_text, border_style="cyan", title="[bold cyan]FIELD MANUAL[/bold cyan]")
+    console.print(protocol_panel)
+
+    input("\n" + " " * 30 + "Press Enter to begin your first transmission...")
