@@ -86,9 +86,6 @@ def start_game() -> None:
             current_level_data = levels[current_level_index]
             target_word = current_level_data["word"]
 
-            complexity = analyse_word(target_word)
-            word_time_limit = (complexity["dots"] * 0.5) + (complexity["dashes"] * 1.0) + 2.0
-
             if current_letter_index >= len(target_word):
                 console.clear()
                 playsound("src/telegraphist/sfx/level_up.wav", block=False)
@@ -115,12 +112,15 @@ def start_game() -> None:
             console.control(Control.home())
 
             if current_letter_index < len(target_word):
+                # Calculate time limit for current character
+                current_char = target_word[current_letter_index]
+                correct_morse = MORSE_CODE_DICT[current_char]
+                complexity = analyse_word(current_char)
+                word_time_limit = (complexity["dots"] * 0.5) + (complexity["dashes"] * 1.0) + 2.0
+
                 # Calculate time remaining on each iteration
                 time_remaining = word_time_limit - (time.time() - word_start_time)
                 time_remaining = max(0, time_remaining)  # Don't show negative time
-
-                current_char = target_word[current_letter_index]
-                correct_morse = MORSE_CODE_DICT[current_char]
 
                 cheat_sheet = f"Transmit '{current_char}': [bold cyan]{correct_morse}[/bold cyan]"
                 transmission_panel = Panel(
