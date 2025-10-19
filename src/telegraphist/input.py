@@ -1,5 +1,6 @@
 import time
 from collections.abc import Callable
+from pathlib import Path
 
 from playsound3 import playsound
 from pynput import keyboard
@@ -9,6 +10,8 @@ DOT_DURATION: float = 0.2
 press_time = None
 key_down: bool = False
 
+_MODULE_DIR = Path(__file__).parent
+_SFX_DIR = _MODULE_DIR / "sfx"
 
 def on_press(key: keyboard.Key | keyboard.KeyCode | None) -> None:
     """Handle spacebar press events for Morse code input.
@@ -42,10 +45,10 @@ def on_release(key: keyboard.Key | keyboard.KeyCode | None, on_char_received: Ca
         duration = time.time() - press_time
 
         if duration < DOT_DURATION:
-            playsound("src/telegraphist/sfx/dot.wav", block=False)
+            playsound(str(_SFX_DIR / "dot.wav"), block=False)
             on_char_received(".")
         else:
-            playsound("src/telegraphist/sfx/dash.wav", block=False)
+            playsound(str(_SFX_DIR / "dash.wav"), block=False)
             on_char_received("-")
 
         press_time = None
