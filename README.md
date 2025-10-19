@@ -4,7 +4,7 @@ Telegraphist is a TUI-based game made in Python which focuses on time, precision
 
 ---
 
-![game screeshot](image.png)
+![demo](demo.gif)
 
 ---
 
@@ -33,6 +33,18 @@ Telegraphist is a text-based game where you have to telegraph messages in a high
 Python 3.10+
 
 ### Easy Installation
+Install uv for your Python Installation
+
+```sh
+pip install uv
+```
+Then run
+
+```sh
+uvx the-telegraphist
+```
+OR
+
 Clone the repository and open it.
 Run the `run.sh` (on Linux/Mac) or `run.bat` (on Windows) to install the game!
 
