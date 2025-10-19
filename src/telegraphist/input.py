@@ -1,3 +1,4 @@
+import threading
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -55,11 +56,16 @@ def on_release(key: keyboard.Key | keyboard.KeyCode | None, on_char_received: Ca
         key_down = False
 
 
-def start_listening(on_char_received: Callable[[str], None]) -> None:
+def start_listening(on_char_received: Callable[[str], None], stop_event: threading.Event) -> None:
     """Start listening for keyboard input to capture Morse code.
 
     Creates a keyboard listener that monitors spacebar press and release
     events. This function blocks execution until the listener is stopped.
     """
-    with keyboard.Listener(on_press=on_press, on_release=lambda key: on_release(key, on_char_received)) as listener:
-        listener.join()
+    listener = keyboard.Listener(on_press=on_press, on_release=lambda key: on_release(key, on_char_received))
+
+    listener.start()
+
+    stop_event.wait()
+
+    listener.stop()

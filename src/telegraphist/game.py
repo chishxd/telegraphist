@@ -33,6 +33,8 @@ word_start_time: float = time.time()
 word_time_limit: float = 15.0
 game_over: bool = False
 
+listener_stop_event: threading.Event | None = None
+
 
 def display_title_screen() -> None:
     console = Console()
@@ -86,122 +88,133 @@ def start_game() -> None:
     Handles positioning of cursor, it's visibility and ensures clearing terminal before and after the game.
     """
     global current_input, player_input_for_letter, current_level_index, current_letter_index, feedback_message
-    global word_time_limit, word_start_time
+    global word_time_limit, word_start_time, listener_stop_event
 
-    display_title_screen()
-    display_tutorial()
+    while True:
+        display_title_screen()
+        display_tutorial()
 
-    # Start the timer AFTER the briefing is complete
-    word_start_time = time.time()
+        reset_game_state()
 
-    listener_thread = threading.Thread(target=start_listening, args=(handle_new_char,))
-    listener_thread.daemon = True
-    listener_thread.start()
+        word_start_time = time.time()
 
-    console = Console()
+        listener_stop_event = threading.Event()
 
-    try:
-        console.control(Control.show_cursor(False))
-        console.clear()
+        listener_thread = threading.Thread(target=start_listening, args=(handle_new_char, listener_stop_event))
+        listener_thread.daemon = True
+        listener_thread.start()
 
-        while not game_over:
-            current_level_data = levels[current_level_index]
-            target_word = current_level_data["word"]
+        console = Console()
+        should_retry = False
 
-            if current_letter_index >= len(target_word):
-                console.clear()
-                playsound(str(_SFX_DIR / "level_up.wav"), block=False)
-
-                current_level_index += 1
-
-                if current_level_index >= len(levels):
-                    msg = "[bold green]Congratulations! You completed all levels![/bold green]"
-                    console.print(Panel(msg, border_style="green"))
-                    input("\n" + " " * 40 + "Press Enter to Continue...")
-                    break
-                else:
-                    completed_msg = f"[bold green]Level {current_level_data['level']} Complete! Transmitted: {current_level_data['word']}[/bold green]"  # noqa: E501
-                    console.print(Panel(completed_msg, border_style="green"))
-                    next_level = levels[current_level_index]["level"]
-                    next_msg = f"[cyan]Get ready for Level {next_level}...[/cyan]"
-                    console.print(Panel(next_msg, border_style="cyan"))
-                    time.sleep(2)
-
-                current_letter_index = 0
-                word_start_time = time.time()
-
-            game_loop()
-
-            console.control(Control.home())
-
-            if current_letter_index < len(target_word):
-                # Calculate time limit for current character
-                current_char = target_word[current_letter_index]
-                correct_morse = MORSE_CODE_DICT[current_char]
-                complexity = analyse_word(current_char)
-                word_time_limit = (complexity["dots"] * 0.5) + (complexity["dashes"] * 1.0) + 2.0
-
-                # Calculate time remaining on each iteration
-                time_remaining = word_time_limit - (time.time() - word_start_time)
-                time_remaining = max(0, time_remaining)  # Don't show negative time
-
-                cheat_sheet = f"Transmit '{current_char}': [bold cyan]{correct_morse}[/bold cyan]"
-                transmission_panel = Panel(
-                    f"[bold red]Time Remaining: {time_remaining:.1f}s[/bold red]\n\n"
-                    f"{cheat_sheet}\n\nYour Input: {player_input_for_letter}",
-                    title="Telegraph Console",
-                    border_style="cyan",
-                )
-
-                console.print(transmission_panel)
-
-                if feedback_message:
-                    console.print(Panel(feedback_message, border_style="yellow"))
-                    feedback_message = ""
-
-            time.sleep(0.05)
-
-        if game_over:
+        try:
+            console.control(Control.show_cursor(False))
             console.clear()
-            current_level_data = levels[current_level_index]
-            target_word = current_level_data["word"]
 
-            game_over_art = r"""
+            while not game_over:
+                current_level_data = levels[current_level_index]
+                target_word = current_level_data["word"]
+
+                if current_letter_index >= len(target_word):
+                    console.clear()
+                    playsound(str(_SFX_DIR / "level_up.wav"), block=False)
+
+                    current_level_index += 1
+
+                    if current_level_index >= len(levels):
+                        msg = "[bold green]Congratulations! You completed all levels![/bold green]"
+                        console.print(Panel(msg, border_style="green"))
+                        input("\n" + " " * 40 + "Press Enter to Continue...")
+                        break
+                    else:
+                        completed_msg = f"[bold green]Level {current_level_data['level']} Complete! Transmitted: {current_level_data['word']}[/bold green]"  # noqa: E501
+                        console.print(Panel(completed_msg, border_style="green"))
+                        next_level = levels[current_level_index]["level"]
+                        next_msg = f"[cyan]Get ready for Level {next_level}...[/cyan]"
+                        console.print(Panel(next_msg, border_style="cyan"))
+                        time.sleep(2)
+
+                    current_letter_index = 0
+                    word_start_time = time.time()
+
+                game_loop()
+
+                console.control(Control.home())
+
+                if current_letter_index < len(target_word):
+                    current_char = target_word[current_letter_index]
+                    correct_morse = MORSE_CODE_DICT[current_char]
+                    complexity = analyse_word(current_char)
+                    word_time_limit = (complexity["dots"] * 0.5) + (complexity["dashes"] * 1.0) + 2.0
+
+                    time_remaining = word_time_limit - (time.time() - word_start_time)
+                    time_remaining = max(0, time_remaining)
+
+                    cheat_sheet = f"Transmit '{current_char}': [bold cyan]{correct_morse}[/bold cyan]"
+                    transmission_panel = Panel(
+                        f"[bold red]Time Remaining: {time_remaining:.1f}s[/bold red]\n\n"
+                        f"{cheat_sheet}\n\nYour Input: {player_input_for_letter}",
+                        title="Telegraph Console",
+                        border_style="cyan",
+                    )
+
+                    console.print(transmission_panel)
+
+                    if feedback_message:
+                        console.print(Panel(feedback_message, border_style="yellow"))
+                        feedback_message = ""
+
+                time.sleep(0.05)
+
+            if game_over:
+                console.clear()
+                current_level_data = levels[current_level_index]
+                target_word = current_level_data["word"]
+
+                game_over_art = r"""
  ▗▄▄▖ ▗▄▖ ▗▖  ▗▖▗▄▄▄▖     ▗▄▖ ▗▖  ▗▖▗▄▄▄▖▗▄▄▖
 ▐▌   ▐▌ ▐▌▐▛▚▞▜▌▐▌       ▐▌ ▐▌▐▌  ▐▌▐▌   ▐▌ ▐▌
 ▐▌▝▜▌▐▛▀▜▌▐▌  ▐▌▐▛▀▀▘    ▐▌ ▐▌▐▌  ▐▌▐▛▀▀▘▐▛▀▚▖
 ▝▚▄▞▘▐▌ ▐▌▐▌  ▐▌▐▙▄▄▖    ▝▚▄▞▘ ▝▚▞▘ ▐▙▄▄▖▐▌ ▐▌
 """
-            console.print(f"[bold red]{game_over_art}[/bold red]", justify="center")
-            console.print("\n")
+                console.print(f"[bold red]{game_over_art}[/bold red]", justify="center")
+                console.print("\n")
 
-            stats_msg = "[yellow]You ran out of time![/yellow]\n\n"
-            stats_msg += f"[cyan]Level Reached:[/cyan] {current_level_data['level']}\n"
-            stats_msg += f"[cyan]Word:[/cyan] {target_word}\n"
-            stats_msg += f"[cyan]Letters Transmitted:[/cyan] {current_letter_index}/{len(target_word)}"
+                stats_msg = "[yellow]You ran out of time![/yellow]\n\n"
+                stats_msg += f"[cyan]Level Reached:[/cyan] {current_level_data['level']}\n"
+                stats_msg += f"[cyan]Word:[/cyan] {target_word}\n"
+                stats_msg += f"[cyan]Letters Transmitted:[/cyan] {current_letter_index}/{len(target_word)}"
 
-            console.print(Panel(stats_msg, title="Transmission Failed", border_style="red"))
+                console.print(Panel(stats_msg, title="Transmission Failed", border_style="red"))
 
-            console.print("\n[bold cyan]Would you like to try again?[/bold cyan]")
-            console.print("[green]1.[/green] Replay Game")
-            console.print("[red]2.[/red] Exit")
+                console.print("\n[bold cyan]Would you like to try again?[/bold cyan]")
+                console.print("[green]1.[/green] Replay Game")
+                console.print("[red]2.[/red] Exit")
 
-            choice = input("\n" + " " * 40 + "Enter your choice (1 or 2): ").strip()
+                choice = input("\n" + " " * 40 + "Enter your choice (1 or 2): ").strip()
 
-            if choice == "1":
-                console.clear()
-                reset_game_state()
-                start_game()
-                return
-            else:
-                pass
+                if choice == "1":
+                    should_retry = True
+                    console.clear()
 
-    except KeyboardInterrupt:
-        pass
+        except KeyboardInterrupt:
+            pass
 
-    finally:
-        console.control(Control.show_cursor(True))
-        console.print("[bold blue]Thank You for playing![/bold blue]")
+        finally:
+            # Stop the listener thread
+            if listener_stop_event:
+                listener_stop_event.set()
+                time.sleep(0.1)  # Give the thread time to stop
+
+            console.control(Control.show_cursor(True))
+
+        # If not retrying, break out of the main loop
+        if not should_retry:
+            break
+
+    # Print final message only once, after the main loop
+    console = Console()
+    console.print("[bold blue]Thank You for playing![/bold blue]")
 
 
 def game_loop() -> None:
